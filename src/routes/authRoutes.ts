@@ -1,11 +1,17 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/authController";
 import { validationMiddleware } from "../middleware/validation.mw";
-const { register, login } = AuthController;
+import authMw from "../middleware/auth.mw";
 
 const router = Router();
 
-router.post("/register", validationMiddleware.register, register);
-router.post("/login", validationMiddleware.login, login);
+router.post(
+  "/register",
+  validationMiddleware.register,
+  authMw.authenticateToken,
+  authMw.authorizeRoles("admin"),
+  AuthController.register
+);
+router.post("/login", validationMiddleware.login, AuthController.login);
 
 export default router;

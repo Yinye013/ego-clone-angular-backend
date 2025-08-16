@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/authService";
 
-const { register, login } = AuthService;
-
 export class AuthController {
   static async register(req: Request, res: Response) {
     const { username, email, password, role, requireOTP } = req.body;
@@ -12,7 +10,7 @@ export class AuthController {
     }
 
     try {
-      const result = await register(
+      const result = await AuthService.register(
         username,
         email,
         password,
@@ -35,7 +33,7 @@ export class AuthController {
     }
 
     try {
-      const result = await login(email, password);
+      const result = await AuthService.login(email, password);
       res.status(200).json({ message: "Login successful", ...result });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
