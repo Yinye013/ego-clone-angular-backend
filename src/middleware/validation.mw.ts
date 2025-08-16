@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import z, { email } from "zod";
+import { z } from "zod";
 
 const validateRequest = (schema: z.ZodSchema) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      return res
-        .status(400)
-        .json({ errors: result.error.flatten().fieldErrors });
+      res.status(400).json({ errors: result.error.flatten().fieldErrors });
+      return;
     }
     next();
   };
@@ -22,13 +21,13 @@ const registerSchema = z.object({
     .string()
     .min(6)
     .max(15, "Password must be between 6 and 15 characters."),
-  email: z.email("Invalid email address."),
+  email: z.string().email("Invalid email address."),
   role: z.string().optional().default("user"),
   requireOTP: z.boolean().optional().default(false),
 });
 
 const loginSchema = z.object({
-  email: z.email("Invalid email address."),
+  email: z.string().email("Invalid email address."),
   password: z
     .string()
     .min(6)
