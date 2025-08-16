@@ -7,9 +7,9 @@ const router = Router();
 
 router.post(
   "/register",
-  validationMiddleware.register,
   authMw.authenticateToken,
   authMw.authorizeRoles("admin"),
+  validationMiddleware.register,
   AuthController.register
 );
 

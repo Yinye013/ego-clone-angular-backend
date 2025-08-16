@@ -42,9 +42,13 @@ export class AuthService {
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
-    const token = jwt.sign({ userId: newUser.id }, jwtSecret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: newUser.id, role: newUser.role },
+      jwtSecret,
+      {
+        expiresIn: "1h",
+      }
+    );
     return { user: newUser, token };
   }
 
@@ -67,7 +71,7 @@ export class AuthService {
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
-    const token = jwt.sign({ userId: user.id }, jwtSecret, {
+    const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, {
       expiresIn: "1h",
     });
 

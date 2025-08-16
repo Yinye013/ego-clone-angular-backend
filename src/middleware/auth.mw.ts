@@ -20,6 +20,10 @@ const authenticateToken = async (
 ): Promise<void> => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
+
+  console.log("🔍 Auth Header:", authHeader);
+  console.log("🔍 Extracted Token:", token ? "Present" : "Missing");
+
   if (!token) {
     res.status(401).json({ error: "Access token required." });
     return;
