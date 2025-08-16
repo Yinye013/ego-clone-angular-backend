@@ -12,6 +12,7 @@ router.post(
   authMw.authorizeRoles("admin"),
   AuthController.register
 );
+
 router.post("/login", validationMiddleware.login, AuthController.login);
 
 export default router;
