@@ -71,6 +71,7 @@ export class AuthService {
       expiresIn: "1h",
     });
 
-    return { user, token };
+    const { password: _, ...userWithoutPassword } = user;
+    return { user: userWithoutPassword, token };
   }
 }
