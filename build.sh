@@ -6,9 +6,13 @@ echo "Starting build process..."
 rm -rf dist
 echo "Cleaned dist folder"
 
-# Install dependencies
-npm install
-echo "Installed dependencies"
+# Install dependencies (without dev dependencies for production)
+npm ci --only=production
+echo "Installed production dependencies"
+
+# Install TypeScript and ts-node for building
+npm install --no-save typescript ts-node tsconfig-paths
+echo "Installed build dependencies"
 
 # Run TypeScript compilation directly
 npx tsc

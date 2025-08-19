@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon",
-    "prebuild": "rimraf dist",
+    "prebuild": "rm -rf dist",
     "build": "tsc && cp data-source.ts dist/",
     "postinstall": "npm run build",
     "start": "node dist/index.js",
