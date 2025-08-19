@@ -12,7 +12,7 @@
     "strictPropertyInitialization": false,
     "allowJs": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "strict": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
@@ -29,6 +29,6 @@
     "typeRoots": ["./node_modules/@types", "./node_modules/@types/node"],
     "types": []
   },
-  "include": ["src/**/*", "*.ts", "**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
