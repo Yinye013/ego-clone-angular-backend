@@ -16,6 +16,9 @@ dist/
 build/
 *.tsbuildinfo
 
+# Explicitly allow build.sh
+!build.sh
+
 # Runtime data
 pids
 *.pid
