@@ -1,6 +1,11 @@
+import { FindManyOptions } from "./../../node_modules/typeorm/browser/find-options/FindManyOptions.d";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import prisma from "../config/db.config";
+import {
+  UserRepository,
+  userRepository,
+} from "../repositories/user.repository";
+import { User } from "../entities/user.entity";
 
 export class AuthService {
   static async register(
@@ -10,9 +15,7 @@ export class AuthService {
     role: string,
     requireOTP: boolean
   ) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await userRepository.findByEmail(email);
 
     if (existingUser) {
       throw new Error("User already exists");
@@ -20,23 +23,16 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-        role,
-        requireOTP,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
-        requireOTP: true,
-      },
-    });
+    const newUser = new User();
+    newUser.username = username;
+    newUser.email = email;
+    newUser.password = hashedPassword;
+    newUser.role = role;
+    newUser.requireOTP = requireOTP;
 
+    await userRepository.saveUser(newUser);
+
+    const { password: _, ...userWithoutPassword } = newUser;
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw new Error("JWT_SECRET is not defined in environment variables");
@@ -49,13 +45,11 @@ export class AuthService {
         expiresIn: "1h",
       }
     );
-    return { user: newUser, token };
+    return { user: userWithoutPassword, token };
   }
 
   static async login(email: string, password: string) {
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    const user = await userRepository.findByEmail(email);
 
     if (!user) {
       throw new Error("Invalid email or password");

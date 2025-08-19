@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../config/db.config";
+import { userRepository } from "../repositories/user.repository";
+import { User } from "../entities/user.entity";
+import { decode } from "punycode";
 
 declare global {
   namespace Express {
@@ -21,9 +23,6 @@ const authenticateToken = async (
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
 
-  console.log("🔍 Auth Header:", authHeader);
-  console.log("🔍 Extracted Token:", token ? "Present" : "Missing");
-
   if (!token) {
     res.status(401).json({ error: "Access token required." });
     return;
@@ -34,9 +33,16 @@ const authenticateToken = async (
       userId: string;
       role: string;
     };
-    req.user = decoded;
 
-    console.log(req.user);
+    const user = await userRepository.findById(decoded.userId);
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    req.user = { userId: decoded.userId, role: decoded.role };
+
     next();
   } catch (error) {
     res.status(403).json({ error: "Invalid access token." });
