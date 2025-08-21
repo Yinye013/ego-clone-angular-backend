@@ -14,5 +14,6 @@ router.post(
 );
 
 router.post("/login", validationMiddleware.login, AuthController.login);
+router.post("/verify-otp", AuthController.verifyOtp);
 
 export default router;

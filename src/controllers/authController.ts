@@ -34,7 +34,32 @@ export class AuthController {
 
     try {
       const result = await AuthService.login(email, password);
+      if (result.user.requireOTP) {
+        return res.status(200).json({
+          message: "OTP required",
+          user: result.user,
+          userId: result.user.id,
+          otpRequired: true,
+        });
+      }
       return res.status(200).json({ message: "Login successful", ...result });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
+  static async verifyOtp(req: Request, res: Response): Promise<Response> {
+    const { userId, otp } = req.body;
+
+    if (!userId || !otp) {
+      return res.status(400).json({ error: "User ID and OTP are required" });
+    }
+
+    try {
+      const result = await AuthService.verifyOtp(userId, otp);
+      return res
+        .status(200)
+        .json({ message: "OTP verified successfully", ...result });
     } catch (error: any) {
       return res.status(400).json({ error: error.message });
     }
