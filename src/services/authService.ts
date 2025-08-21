@@ -1,11 +1,9 @@
-import { FindManyOptions } from "./../../node_modules/typeorm/browser/find-options/FindManyOptions.d";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import {
-  UserRepository,
-  userRepository,
-} from "../repositories/user.repository";
+import { userRepository } from "../repositories/user.repository";
 import { User } from "../entities/user.entity";
+import { OtpService } from "./otpService";
+import { EmailService } from "./emailService";
 
 export class AuthService {
   static async register(
@@ -55,9 +53,16 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
+    const { password: _, ...userWithoutPassword } = user;
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
+    }
+
+    if (user.requireOTP) {
+      const otp = OtpService.generateOTP(user.id, user.email);
+      await EmailService.sendOtpEmail(user.email, otp);
+      return { user: userWithoutPassword, message: "OTP sent to your email" };
     }
 
     const jwtSecret = process.env.JWT_SECRET;
@@ -69,7 +74,34 @@ export class AuthService {
       expiresIn: "1h",
     });
 
+    return { user: userWithoutPassword, token };
+  }
+
+  static async verifyOtp(userId: string, otp: string) {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isValidOtp = OtpService.verifyOTP(user.id, otp);
+    if (!isValidOtp) {
+      throw new Error("Invalid OTP");
+    }
+
+    user.requireOTP = false;
+    await userRepository.saveUser(user);
+
     const { password: _, ...userWithoutPassword } = user;
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
+
+    const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, {
+      expiresIn: "1h",
+    });
+
     return { user: userWithoutPassword, token };
   }
 }
