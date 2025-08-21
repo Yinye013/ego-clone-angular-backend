@@ -49,14 +49,21 @@ export class AuthController {
   }
 
   static async verifyOtp(req: Request, res: Response): Promise<Response> {
-    const { userId, otp } = req.body;
+    console.log("Headers:", req.headers);
+    console.log("Body (raw):", req.body);
 
-    if (!userId || !otp) {
+    // Safely extract values with fallbacks
+    const id = req.body?.id || req.body?.userId;
+    const otp = req.body?.otp || req.body?.otpCode;
+
+    console.log("Extracted values:", { id, otp });
+
+    if (!id || !otp) {
       return res.status(400).json({ error: "User ID and OTP are required" });
     }
 
     try {
-      const result = await AuthService.verifyOtp(userId, otp);
+      const result = await AuthService.verifyOtp(id, otp);
       return res
         .status(200)
         .json({ message: "OTP verified successfully", ...result });

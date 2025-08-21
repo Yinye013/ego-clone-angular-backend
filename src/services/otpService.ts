@@ -37,7 +37,8 @@ export class OtpService {
       return false;
     }
 
-    if (record.code !== code) {
+    //compare record.otp against code, not record.code against code, learnt this the hard way
+    if (record.otp !== code) {
       console.log(` OTP verification failed for ${userId}: Invalid code`);
       return false;
     }
