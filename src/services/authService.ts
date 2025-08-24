@@ -103,10 +103,10 @@ export class AuthService {
       throw new Error("Invalid OTP");
     }
 
-    user.requireOTP = false;
-    const updatedUser = await userRepository.updateUser(user);
+    // user.requireOTP = true;
+    // const updatedUser = await userRepository.updateUser(user);
 
-    const { password: _, ...userWithoutPassword } = updatedUser;
+    const { password: _, ...userWithoutPassword } = user;
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
