@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 import { userRepository } from "../repositories/user.repository";
 import { User } from "../entities/user.entity";
 import { OtpService } from "./otpService";
@@ -21,28 +22,41 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User();
-    newUser.username = username;
-    newUser.email = email;
-    newUser.password = hashedPassword;
-    newUser.role = role;
-    newUser.requireOTP = requireOTP;
+    // Create a new user with explicitly set values for all required fields
+    const now = new Date();
+    const userData = {
+      id: uuidv4(),
+      username,
+      email,
+      password: hashedPassword,
+      role,
+      requireOTP,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    await userRepository.saveUser(newUser);
+    console.log("Creating user with data:", {
+      ...userData,
+      password: "[REDACTED]", // Don't log the password
+    });
 
-    const { password: _, ...userWithoutPassword } = newUser;
+    const savedUser = await userRepository.createUser(userData);
+    console.log("User saved successfully with ID:", savedUser.id);
+
+    const { password: _, ...userWithoutPassword } = savedUser;
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
     const token = jwt.sign(
-      { userId: newUser.id, role: newUser.role },
+      { userId: savedUser.id, role: savedUser.role },
       jwtSecret,
       {
         expiresIn: "1h",
       }
     );
+
     return { user: userWithoutPassword, token };
   }
 
@@ -53,11 +67,12 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    const { password: _, ...userWithoutPassword } = user;
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
+
+    const { password: _, ...userWithoutPassword } = user;
 
     if (user.requireOTP) {
       const otp = OtpService.generateOTP(user.id, user.email);
@@ -89,9 +104,9 @@ export class AuthService {
     }
 
     user.requireOTP = false;
-    await userRepository.saveUser(user);
+    const updatedUser = await userRepository.updateUser(user);
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = updatedUser;
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
