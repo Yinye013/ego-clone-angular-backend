@@ -49,10 +49,6 @@ export class AuthController {
   }
 
   static async verifyOtp(req: Request, res: Response): Promise<Response> {
-    console.log("Headers:", req.headers);
-    console.log("Body (raw):", req.body);
-
-    // Safely extract values with fallbacks
     const id = req.body?.id || req.body?.userId;
     const otp = req.body?.otp || req.body?.otpCode;
 
