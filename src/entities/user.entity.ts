@@ -28,6 +28,9 @@ export class User {
     }
   }
 
+  @Column({ nullable: true })
+  profileImage: string;
+
   @Column({ unique: true })
   username: string;
 
@@ -37,9 +40,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: "user" })
-  role: string;
-
   @Column({ default: false })
   requireOTP: boolean;
 
@@ -48,4 +48,25 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  fullName: string;
+
+  @Column({ nullable: true })
+  mobilePhone: string;
+
+  @Column({ nullable: true })
+  status: string;
+
+  @Column({ nullable: true })
+  branch: string;
+
+  @Column({ default: false })
+  superUser: boolean;
+
+  @Column({ nullable: true })
+  systemRole: string;
+
+  @Column({ type: "text", nullable: true })
+  address: string;
 }

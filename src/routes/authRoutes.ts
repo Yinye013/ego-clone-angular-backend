@@ -5,13 +5,15 @@ import authMw from "../middleware/auth.mw";
 
 const router = Router();
 
-router.post(
-  "/register",
-  authMw.authenticateToken,
-  authMw.authorizeRoles("admin"),
-  validationMiddleware.register,
-  AuthController.register
-);
+router.post("/register", AuthController.register);
+
+// router.post(
+//   "/register",
+//   authMw.authenticateToken,
+//   authMw.authorizeRoles("admin"),
+//   validationMiddleware.register,
+//   AuthController.register
+// );
 
 router.post("/login", validationMiddleware.login, AuthController.login);
 router.post("/verify-otp", AuthController.verifyOtp);

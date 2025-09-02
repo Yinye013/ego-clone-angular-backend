@@ -22,8 +22,15 @@ const registerSchema = z.object({
     .min(6)
     .max(15, "Password must be between 6 and 15 characters."),
   email: z.string().email("Invalid email address."),
-  role: z.string().optional().default("user"),
   requireOTP: z.boolean().optional().default(false),
+  profileImage: z.string().optional(),
+  fullName: z.string().optional(),
+  mobilePhone: z.string().optional(),
+  status: z.string().optional(),
+  branch: z.string().optional(),
+  superUser: z.boolean().optional().default(false),
+  systemRole: z.string().optional(),
+  address: z.string().optional(),
 });
 
 const loginSchema = z.object({

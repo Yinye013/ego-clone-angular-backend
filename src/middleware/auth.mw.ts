@@ -9,7 +9,7 @@ declare global {
     interface Request {
       user?: {
         userId: string;
-        role: string;
+        systemRole: string;
       };
     }
   }
@@ -31,7 +31,7 @@ const authenticateToken = async (
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
-      role: string;
+      systemRole: string;
     };
 
     const user = await userRepository.findById(decoded.userId);
@@ -41,7 +41,7 @@ const authenticateToken = async (
       return;
     }
 
-    req.user = { userId: decoded.userId, role: decoded.role };
+    req.user = { userId: decoded.userId, systemRole: decoded.systemRole };
 
     next();
   } catch (error) {
@@ -52,7 +52,7 @@ const authenticateToken = async (
 
 const authorizeRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !roles.includes(req.user.systemRole)) {
       res.status(403).json({ error: "Forbidden" });
       return;
     }

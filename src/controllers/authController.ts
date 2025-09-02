@@ -1,12 +1,30 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/authService";
+import { profile } from "console";
 
 export class AuthController {
   static async register(req: Request, res: Response): Promise<Response> {
-    const { username, email, password, role, requireOTP } = req.body;
+    const {
+      username,
+      email,
+      password,
+      requireOTP,
+      profileImage,
+      fullName,
+      mobilePhone,
+      status,
+      branch,
+      superUser,
+      systemRole,
+      address,
+    } = req.body;
 
-    if (!username || !email || !password || !role || requireOTP === undefined) {
-      return res.status(400).json({ error: "All fields are required" });
+    if (!username || !email || !password || requireOTP === undefined) {
+      return res
+        .status(400)
+        .json({
+          error: "Username, email, password, and requireOTP are required",
+        });
     }
 
     try {
@@ -14,8 +32,15 @@ export class AuthController {
         username,
         email,
         password,
-        role,
-        requireOTP
+        systemRole || "user",
+        requireOTP,
+        profileImage,
+        fullName,
+        mobilePhone,
+        status,
+        branch,
+        superUser,
+        address
       );
       return res
         .status(201)

@@ -5,14 +5,22 @@ import { userRepository } from "../repositories/user.repository";
 import { User } from "../entities/user.entity";
 import { OtpService } from "./otpService";
 import { EmailService } from "./emailService";
+import { profile } from "console";
 
 export class AuthService {
   static async register(
     username: string,
     email: string,
     password: string,
-    role: string,
-    requireOTP: boolean
+    requireOTP: boolean,
+    profileImage?: string,
+    fullName?: string,
+    mobilePhone?: string,
+    status?: string,
+    branch?: string,
+    superUser?: boolean,
+    systemRole?: string,
+    address?: string
   ) {
     const existingUser = await userRepository.findByEmail(email);
 
@@ -29,10 +37,17 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
-      role,
       requireOTP,
       createdAt: now,
       updatedAt: now,
+      profileImage,
+      fullName,
+      mobilePhone,
+      status,
+      branch,
+      superUser,
+      systemRole,
+      address,
     };
 
     console.log("Creating user with data:", {
@@ -50,7 +65,7 @@ export class AuthService {
     }
 
     const token = jwt.sign(
-      { userId: savedUser.id, role: savedUser.role },
+      { userId: savedUser.id, systemRole: savedUser.systemRole },
       jwtSecret,
       {
         expiresIn: "1h",
@@ -85,9 +100,13 @@ export class AuthService {
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user.id, systemRole: user.systemRole },
+      jwtSecret,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     return { user: userWithoutPassword, token };
   }
@@ -121,9 +140,13 @@ export class AuthService {
       throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user.id, systemRole: user.systemRole },
+      jwtSecret,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     return { user: userWithoutPassword, token };
   }
