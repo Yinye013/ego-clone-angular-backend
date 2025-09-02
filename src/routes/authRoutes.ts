@@ -15,5 +15,11 @@ router.post(
 
 router.post("/login", validationMiddleware.login, AuthController.login);
 router.post("/verify-otp", AuthController.verifyOtp);
+router.get(
+  "/users",
+  authMw.authenticateToken,
+  authMw.authorizeRoles("admin"),
+  AuthController.getAllUsers
+);
 
 export default router;

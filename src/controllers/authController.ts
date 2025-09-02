@@ -48,6 +48,19 @@ export class AuthController {
     }
   }
 
+  static async getAllUsers(req: Request, res: Response): Promise<Response> {
+    try {
+      const users = await AuthService.getAllUsers();
+      return res.status(200).json({
+        message: "Users retrived successfully",
+        users,
+        count: users.length,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   static async verifyOtp(req: Request, res: Response): Promise<Response> {
     const id = req.body?.id || req.body?.userId;
     const otp = req.body?.otp || req.body?.otpCode;

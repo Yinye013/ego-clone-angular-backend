@@ -92,6 +92,10 @@ export class AuthService {
     return { user: userWithoutPassword, token };
   }
 
+  static async getAllUsers(): Promise<User[]> {
+    return userRepository.findAll();
+  }
+
   static async verifyOtp(userId: string, otp: string) {
     const user = await userRepository.findById(userId);
     if (!user) {

@@ -36,6 +36,20 @@ export class UserRepository {
   async findById(id: string): Promise<User | null> {
     return this.repository.findOne({ where: { id } });
   }
+
+  async findAll(): Promise<User[]> {
+    return this.repository.find({
+      select: [
+        "id",
+        "username",
+        "email",
+        "role",
+        "requireOTP",
+        "createdAt",
+        "updatedAt",
+      ],
+    });
+  }
 }
 //repository communicates from the entity manager to the service layer. Learnt this
 
