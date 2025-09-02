@@ -61,6 +61,25 @@ export class AuthController {
     }
   }
 
+  static async getUserById(req: Request, res: Response): Promise<Response> {
+    const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    try {
+      const user = await AuthService.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      return res
+        .status(200)
+        .json({ message: "User retrieved successfully", user });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   static async verifyOtp(req: Request, res: Response): Promise<Response> {
     const id = req.body?.id || req.body?.userId;
     const otp = req.body?.otp || req.body?.otpCode;

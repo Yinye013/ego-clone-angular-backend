@@ -22,4 +22,11 @@ router.get(
   AuthController.getAllUsers
 );
 
+router.get(
+  "/users/:id",
+  authMw.authenticateToken,
+  authMw.authorizeRoles("admin"),
+  AuthController.getUserById
+);
+
 export default router;
