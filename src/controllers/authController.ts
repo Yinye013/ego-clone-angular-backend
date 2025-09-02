@@ -32,7 +32,6 @@ export class AuthController {
         username,
         email,
         password,
-        systemRole || "user",
         requireOTP,
         profileImage,
         fullName,
@@ -40,6 +39,7 @@ export class AuthController {
         status,
         branch,
         superUser,
+        systemRole,
         address
       );
       return res
