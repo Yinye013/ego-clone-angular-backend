@@ -5,11 +5,6 @@ import authMw from "../middleware/auth.mw";
 
 const router = Router();
 
-// router.post(
-//   "/register",
-//   AuthController.register
-// );
-
 router.post(
   "/register",
   authMw.authenticateToken,
