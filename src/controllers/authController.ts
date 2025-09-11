@@ -20,11 +20,9 @@ export class AuthController {
     } = req.body;
 
     if (!username || !email || !password || requireOTP === undefined) {
-      return res
-        .status(400)
-        .json({
-          error: "Username, email, password, and requireOTP are required",
-        });
+      return res.status(400).json({
+        error: "Username, email, password, and requireOTP are required",
+      });
     }
 
     try {
@@ -102,6 +100,31 @@ export class AuthController {
         .json({ message: "User retrieved successfully", user });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async updateUserStatus(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
+    const userId = req.params.id;
+    const { status } = req.body;
+
+    if (!userId || !status) {
+      return res.status(400).json({ error: "User ID and status are required" });
+    }
+
+    try {
+      const updatedUser = await AuthService.updateUserStatus(userId, status);
+      const { password, ...userWithoutPassword } = updatedUser;
+      return res
+        .status(200)
+        .json({
+          message: "User status updated successfully",
+          user: userWithoutPassword,
+        });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
     }
   }
 

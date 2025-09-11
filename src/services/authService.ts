@@ -119,6 +119,16 @@ export class AuthService {
     return userRepository.findById(id);
   }
 
+  static async updateUserStatus(id: string, status: string): Promise<User> {
+    const user = await userRepository.findById(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.status = status;
+    return userRepository.updateUser(user);
+  }
+
   static async verifyOtp(userId: string, otp: string) {
     const user = await userRepository.findById(userId);
     if (!user) {
